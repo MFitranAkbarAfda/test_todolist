@@ -11,7 +11,4 @@ $dbname = "database_todolist";
 
 $conn = new mysqli($host, $user, $pass, $dbname);
 
-if ($conn->connect_error) {
-    die(json_encode(["message" => "Koneksi database gagal: " . $conn->connect_error]));
-}
 ?>
