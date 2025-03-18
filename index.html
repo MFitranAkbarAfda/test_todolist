@@ -16,25 +16,30 @@
 
     <script>
        function fetchTasks() {
-            fetch("/todolist/api/tasks.php")
-                .then(response => response.json())
-                .then(data => {
-                    let taskList = document.getElementById("taskList");
-                    taskList.innerHTML = "";
-                    data.forEach(task => {
-                        let li = document.createElement("li");
-                        li.className = task.status_task === 'completed' ? 'completed' : '';
-                        
-                        li.innerHTML = `
-                            <span>${task.task}</span>
+    fetch("/todolist/api/tasks.php")
+        .then(response => response.json())
+        .then(data => {
+            let taskList = document.getElementById("taskList");
+            taskList.innerHTML = "";
+            data.forEach(task => {
+                let li = document.createElement("li");
+                li.className = task.status_task === 'completed' ? 'completed' : '';
+
+                li.innerHTML = `
+                    <div class="task-container">
+                        <span class="task-text">${task.task}</span>
+                        <div class="task-buttons">
                             <button onclick="updateTask(${task.id})">✔</button>
                             ${task.status_task !== 'completed' ? `<button onclick="deleteTask(${task.id})">❌</button>` : ''}
-                        `;
+                        </div>
+                    </div>
+                `;
 
-                        taskList.appendChild(li);
-                    });
-                });
-        }
+                taskList.appendChild(li);
+            });
+        });
+}
+
 
 
 
