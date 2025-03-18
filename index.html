@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List API</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h2>To-Do List</h2>
+    <input type="text" id="taskInput" placeholder="Tambah Tugas Baru">
+    <button onclick="addTask()">Tambah</button>
+
+    <ul id="taskList"></ul>
+
+    <script>
+       function fetchTasks() {
+            fetch("/todolist/api/tasks.php")
+                .then(response => response.json())
+                .then(data => {
+                    let taskList = document.getElementById("taskList");
+                    taskList.innerHTML = "";
+                    data.forEach(task => {
+                        let li = document.createElement("li");
+                        li.className = task.status_task === 'completed' ? 'completed' : '';
+                        
+                        li.innerHTML = `
+                            <span>${task.task}</span>
+                            <button onclick="updateTask(${task.id})">✔</button>
+                            ${task.status_task !== 'completed' ? `<button onclick="deleteTask(${task.id})">❌</button>` : ''}
+                        `;
+
+                        taskList.appendChild(li);
+                    });
+                });
+        }
+
+
+
+        function addTask() {
+            let taskInput = document.getElementById("taskInput").value;
+            fetch("/todolist/api/tasks.php", {
+                method: "POST",
+                body: JSON.stringify({ task: taskInput }),
+                headers: { "Content-Type": "application/json" }
+            }).then(response => response.json())
+            .then(data => {
+                console.log(data);
+                fetchTasks();
+                document.getElementById("taskInput").value = "";
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+
+        function updateTask(id) {
+            fetch("/todolist/api/tasks.php", {
+                method: "PUT",
+                body: JSON.stringify({ id: id }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Response dari server:", data);
+                fetchTasks();
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+
+        function deleteTask(id) {
+            let confirmation = confirm("Apakah Anda yakin ingin menghapus tugas ini?");
+            if (confirmation) {
+                fetch("/todolist/api/tasks.php", {
+                    method: "DELETE",
+                    body: JSON.stringify({ id: id }),
+                    headers: { "Content-Type": "application/json" }
+                }).then(() => fetchTasks());
+            }
+        }
+
+
+        fetchTasks();
+    </script>
+
+</body>
+</html>
